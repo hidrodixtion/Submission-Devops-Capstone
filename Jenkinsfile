@@ -8,16 +8,6 @@ pipeline {
 			}
 		}
 
-		stage('Set current kubectl context') {
-			steps {
-				withAWS(region:'ap-southeast-1', credentials:'AWSCapstoneCred') {
-					sh '''
-						kubectl config use-context "arn:aws:eks:ap-southeast-1:365011820155:cluster/my-cluster"
-					'''
-				}
-			}
-		}
-
 		stage('Deploy blue container') {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'AWSCapstoneCred') {
