@@ -49,9 +49,9 @@ pipeline {
 		stage('Deploy blue container') {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
-					sh '''
-						kubectl apply -f ./controller_blue.json
-					'''
+                    sh 'aws eks --region ap-southeast-1 update-kubeconfig --name my-cluster'
+					sh 'kubectl config use-context arn:aws:eks:ap-southeast-1:365011820155:cluster/my-cluster'
+					sh 'kubectl apply -f ./controller_blue.json'
 				}
 			}
 		}
@@ -59,9 +59,7 @@ pipeline {
 		stage('Deploy green container') {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
-					sh '''
-						kubectl apply -f ./controller_green.json
-					'''
+					sh 'kubectl apply -f ./controller_green.json'
 				}
 			}
 		}
@@ -69,9 +67,7 @@ pipeline {
 		stage('Create the load balancer service in the cluster, redirect to blue') {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
-					sh '''
-						kubectl apply -f ./lb_service_blue.json
-					'''
+					sh 'kubectl apply -f ./lb_service_blue.json'
 				}
 			}
 		}
@@ -85,9 +81,7 @@ pipeline {
 		stage('Create the load balancer service in the cluster, redirect to green') {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
-					sh '''
-						kubectl apply -f ./lb_service_green.json
-					'''
+					sh 'kubectl apply -f ./lb_service_green.json'
 				}
 			}
 		}
