@@ -40,7 +40,7 @@ pipeline {
 		stage('Set current kubectl context') {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
-                    sh 'aws eks --region ap-southeast-1 update-kubeconfig --name my-cluster'
+                    sh 'aws eks --region ap-southeast-1 update-kubeconfig --name my-cluster --role-arn arn:aws:iam::365011820155:user/hidrodixtion'
 					sh 'kubectl config use-context arn:aws:eks:ap-southeast-1:365011820155:cluster/my-cluster'
 				}
 			}
@@ -49,8 +49,6 @@ pipeline {
 		stage('Deploy blue container') {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
-                    sh 'aws eks --region ap-southeast-1 update-kubeconfig --name my-cluster'
-					sh 'kubectl config use-context arn:aws:eks:ap-southeast-1:365011820155:cluster/my-cluster'
 					sh 'kubectl apply -f ./controller_blue.json'
 				}
 			}
