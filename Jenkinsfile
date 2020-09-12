@@ -8,17 +8,30 @@ pipeline {
 			}
 		}
 
+        stage('Build Docker Image') {
+			steps {
+				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]){
+					sh '''
+						docker build -t hidrodixtion/capstone .
+					'''
+				}
+			}
+		}
+
+		stage('Push Image To Dockerhub') {
+			steps {
+				withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD']]){
+					sh '''
+						docker login -u $USERNAME -p $PASSWORD
+						docker push hidrodixtion/capstone
+					'''
+				}
+			}
+		}
+
         stage('Test upload S3') {
             steps {
                 withAWS(region:'ap-southeast-1', credentials:'awscred') {
-					s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'capstone-pipeline-bucket')
-				}
-            }
-        }
-
-        stage('Test upload S3-2') {
-            steps {
-                withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
 					s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'capstone-pipeline-bucket')
 				}
             }
@@ -35,7 +48,7 @@ pipeline {
 
 		stage('Deploy blue container') {
 			steps {
-				withAWS(region:'ap-southeast-1', credentials:'awscred') {
+				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
 					sh '''
 						kubectl apply -f ./controller_blue.json
 					'''
@@ -45,7 +58,7 @@ pipeline {
 
 		stage('Deploy green container') {
 			steps {
-				withAWS(region:'ap-southeast-1', credentials:'awscred') {
+				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
 					sh '''
 						kubectl apply -f ./controller_green.json
 					'''
@@ -55,7 +68,7 @@ pipeline {
 
 		stage('Create the load balancer service in the cluster, redirect to blue') {
 			steps {
-				withAWS(region:'ap-southeast-1', credentials:'awscred') {
+				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
 					sh '''
 						kubectl apply -f ./lb_service_blue.json
 					'''
@@ -71,7 +84,7 @@ pipeline {
 
 		stage('Create the load balancer service in the cluster, redirect to green') {
 			steps {
-				withAWS(region:'ap-southeast-1', credentials:'awscred') {
+				withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
 					sh '''
 						kubectl apply -f ./lb_service_green.json
 					'''
