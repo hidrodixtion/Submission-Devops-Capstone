@@ -33,7 +33,7 @@ pipeline {
 			steps {
 				withAWS(region:'ap-southeast-1', credentials:'AWSCapstoneCred') {
 					sh '''
-						kubectl config use-context my-cluster.ap-southeast-1.eksctl.io
+						kubectl config use-context hidrodixtion@my-cluster.ap-southeast-1.eksctl.io
 					'''
 				}
 			}
