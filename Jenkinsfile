@@ -16,7 +16,7 @@ pipeline {
             }
         }
 
-        stage('Test upload S3') {
+        stage('Test upload S3-2') {
             steps {
                 withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
 					s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'capstone-pipeline-bucket')
