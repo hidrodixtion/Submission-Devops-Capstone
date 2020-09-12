@@ -16,9 +16,17 @@ pipeline {
             }
         }
 
+        stage('Test upload S3') {
+            steps {
+                withAWS(region:'ap-southeast-1', credentials:'awsuserpass') {
+					s3Upload(pathStyleAccessEnabled: true, payloadSigningEnabled: true, file:'index.html', bucket:'capstone-pipeline-bucket')
+				}
+            }
+        }
+
 		stage('Set current kubectl context') {
 			steps {
-				withAWS(region:'ap-southeast-1', credentials:'awscred') {
+				withAWS(region:'ap-southeast-1', credentials:'userpass') {
                     sh 'aws eks --region ap-southeast-1 update-kubeconfig --name my-cluster'
 					sh 'kubectl config use-context arn:aws:eks:ap-southeast-1:365011820155:cluster/my-cluster'
 				}
